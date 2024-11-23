@@ -2,27 +2,38 @@ import express from "express";
 import multer from "multer";
 import { listarPosts, postarNovoPost, uploadImagem } from "../controllers/post.Controller.js";
 
+// Configura o armazenamento de arquivos enviados pelo usuário
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname);
-    }
+  // Define o diretório de destino para os arquivos enviados
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  // Define o nome do arquivo no servidor
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  }
 });
 
+// Cria uma instância do multer com a configuração de armazenamento
 const upload = multer({ dest: "./uploads" , storage});
 
+// Função para configurar as rotas da aplicação
 const routes = (app) => {
-    // Habilita o parsing de JSON no corpo das requisições.
-    app.use(express.json());
-    // Rota GET para a URL '/posts'. Quando essa rota é acessada, a função getTodosPosts é chamada 
-    // e os posts são retornados como resposta em formato JSON.
-    //Rota para buscar todos os posts
-    app.get("/posts", listarPosts);
-    // Rota para criar um post
-    app.post("/posts", postarNovoPost);
-    app.post("/upload", upload.single("imagem"), uploadImagem);
+  // Habilita o parsing de dados JSON no corpo das requisições
+  app.use(express.json());
+
+  // Rota GET para listar todos os posts
+  // Quando uma requisição GET é feita para a URL '/posts', a função listarPosts é chamada
+  app.get("/posts", listarPosts);
+
+  // Rota POST para criar um novo post
+  // Quando uma requisição POST é feita para a URL '/posts', a função postarNovoPost é chamada
+  app.post("/posts", postarNovoPost);
+
+  // Rota POST para fazer upload de uma imagem
+  // Quando uma requisição POST é feita para a URL '/upload', o middleware 'upload.single("imagem")'
+  // processa o arquivo enviado e a função uploadImagem é chamada
+  app.post("/upload", upload.single("imagem"), uploadImagem);
 }
 
 export default routes;
